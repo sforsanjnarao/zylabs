@@ -14,6 +14,9 @@ export interface SessionSummary {
 export interface Source {
   title: string;
   url: string;
+  n?: number;
+  facet?: string;
+  date?: string;
 }
 
 export interface Report {
