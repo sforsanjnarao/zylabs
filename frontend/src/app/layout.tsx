@@ -34,7 +34,7 @@ export default function RootLayout({
           <div className="mx-auto flex h-14 w-full max-w-5xl items-center px-5">
             <Link href="/" className="flex items-baseline gap-2 font-semibold">
               <span className="text-lg">
-                <span className="text-primary">project</span>01
+                <span className="text-primary">Zylabs</span>
               </span>
               <span className="text-xs text-muted-foreground">
                 Research Copilot
