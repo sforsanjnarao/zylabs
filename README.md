@@ -11,13 +11,14 @@ and produces a structured sales briefing — then lets you chat with the report.
 
 ## Features
 
-- **Create research sessions** with a company, website, and objective.
-- **Multi-node LangGraph workflow** (Planner → Research → Analysis → Quality Check → Report) with a conditional quality-retry loop.
-- **Live web research** via Tavily, with real source URLs.
+- **Create research sessions** with a company, website, and objective; delete past sessions from the history list.
+- **Multi-node LangGraph workflow** (Planner → Research → Analysis → Quality Check → Report) with a conditional quality-retry loop that re-researches only the weak areas.
+- **Deep, facet-based web research** via Tavily: the planner emits 4–6 targeted queries across fixed facets (overview/products, customers, funding, leadership/hiring, news, competitors/risks) plus a website-based disambiguation step, run concurrently, with recency-biased news.
 - **Structured report** covering 9 sections: Company Overview, Products & Services, Target Customers, Business Signals, Risks & Challenges, Discovery Questions, Outreach Strategy, Unknowns, and Sources.
+- **Inline `[n]` citations** tied to a numbered, dated source list, with report and chat rendered as Markdown (clickable superscript citations).
 - **Live progress** streamed to the UI via Server-Sent Events.
 - **Follow-up chat** grounded in the generated report.
-- **Persistence** of sessions, reports, steps, and chat history (SQLite).
+- **Persistence** of sessions, reports, steps, and chat history (SQLite locally, Postgres in production; cascade deletes).
 
 ---
 
@@ -29,8 +30,8 @@ and produces a structured sales briefing — then lets you chat with the report.
 | Backend     | Python + FastAPI                                    |
 | AI Workflow | LangGraph + LangChain                               |
 | LLM         | OpenAI (`gpt-4o-mini` by default)                  |
-| Web Search  | Tavily                                              |
-| Storage     | SQLite (via SQLAlchemy)                             |
+| Web Search  | Tavily (concurrent multi-query, facet-based)        |
+| Storage     | SQLAlchemy — SQLite (local) / Postgres (production)  |
 
 ---
 
@@ -120,10 +121,14 @@ Open `http://localhost:3000`.
 
 1. You create a session and press **Start research**.
 2. The backend launches the LangGraph workflow in a background thread.
-3. Each node (planner, research, analysis, quality check, report) runs in turn,
-   writing progress to the database.
+3. Each node runs in turn, writing progress to the database: the **planner**
+   produces a disambiguation + targeted facet queries, **research** runs them
+   concurrently and numbers the sources, **analysis** writes the sections with
+   inline `[n]` citations, **quality check** gates the result (and, if weak,
+   sends only the weak facets back to research), then **report** finalizes it.
 4. The frontend streams that progress live via SSE.
-5. When finished, the structured report is displayed and you can chat with it.
+5. When finished, the report is displayed as formatted Markdown with clickable
+   citations and a numbered, dated source list — and you can chat with it.
 
 ## Documentation
 

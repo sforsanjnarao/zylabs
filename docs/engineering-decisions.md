@@ -81,6 +81,30 @@ deliberate choice, since the backend must be FastAPI. For an internal,
 logged-in dashboard the interactive parts are client components, so SSR adds
 little here.
 
+## Decision 5: Multi-query, facet-based research with inline citations
+
+**What I did.** Upgraded the research stage from a single broad Tavily query to a
+structured pipeline. The planner emits a typed `ResearchPlan` (a disambiguation
+line plus 4-6 targeted queries spread across fixed facets: overview/products,
+customers, funding, leadership/hiring, news, competitors/risks). The research
+node runs those queries concurrently (thread pool), numbers and de-duplicates
+sources, and uses a recency-biased search for the `news` facet. The analysis
+node adds inline `[n]` citations tied to real source numbers, and the quality
+node returns which facets are weak so a redo re-researches only those facets.
+
+**Alternatives considered.**
+- *Keep the single broad query.* Simplest and cheapest, but thin/off-target for
+  smaller or ambiguously named companies, and no per-claim verifiability.
+- *Sequential multi-query.* Same depth but much slower (latency adds up per call).
+- *Re-research everything on each retry.* Simple, but doubles cost for the whole
+  report when usually only one or two facets are weak.
+
+**Tradeoffs.** This trades higher per-report cost (several Tavily calls instead
+of one) for materially better depth, accuracy, disambiguation, and trust
+(citations). Concurrency hides most of the added latency, and the targeted redo
+keeps retries cheap. The fixed facet list also lets the quality node refer to
+weak areas by name, which is what makes the targeted redo possible.
+
 ---
 
 ## Bonus — What I'd improve with 2 more weeks
@@ -89,8 +113,8 @@ little here.
   retries with backoff, and proper job visibility.
 - **LangGraph checkpointing** (SqliteSaver/Postgres) keyed by session id, enabling
   true resume-after-crash and partial re-runs of single nodes.
-- **Inline citations** linking each claim to its source, plus dated, recency-ranked
-  business signals.
+- **Per-claim verification UI** that surfaces, for each sentence, the exact source
+  snippet behind it (building on the inline citations already shipped).
 - **Cost & reliability hardening:** caching of repeated company lookups, per-user
   rate limits, model fallbacks (`with_fallbacks`), and structured cost logging.
 - **Tests:** unit tests for each node with a mocked LLM/search, and an API test
