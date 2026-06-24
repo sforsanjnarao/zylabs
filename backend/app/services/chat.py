@@ -48,6 +48,9 @@ def answer(db, session, user_message: str) -> str:
             f"You are a sales research assistant helping prepare for a meeting "
             f"with {session.company_name}. Answer using ONLY the research report "
             f"below. If the answer isn't in it, say so honestly.\n\n"
+            f"Format your answer in clean Markdown: short paragraphs, **bold** "
+            f"for key terms, and bullet lists ('- ' items) when listing multiple "
+            f"points. Keep it concise and skimmable.\n\n"
             f"RESEARCH REPORT:\n{_report_context(report)}"
         ))
     ]

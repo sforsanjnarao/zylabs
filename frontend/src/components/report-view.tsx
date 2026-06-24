@@ -5,35 +5,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import { Markdown } from "@/components/markdown";
 
 /**
- * Render text that may contain [n] citation markers, turning each marker into
- * a small superscript link to the matching numbered source.
+ * Turn [n] citation markers into markdown links pointing at the matching
+ * numbered source, so they render as clickable superscript references.
  */
-function withCitations(text: string, sources: Source[]): React.ReactNode[] {
+function linkCitations(text: string, sources: Source[]): string {
   const byNumber = new Map<number, Source>();
   sources.forEach((s, i) => byNumber.set(s.n ?? i + 1, s));
-
-  return text.split(/(\[\d+\])/g).map((part, i) => {
-    const m = part.match(/^\[(\d+)\]$/);
-    if (!m) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const n = Number(m[1]);
-    const src = byNumber.get(n);
-    if (!src) return <React.Fragment key={i}>{part}</React.Fragment>;
-    return (
-      <sup key={i} className="ml-0.5">
-        <a
-          href={src.url}
-          target="_blank"
-          rel="noreferrer"
-          title={src.title || src.url}
-          className="text-primary underline-offset-2 hover:underline"
-        >
-          [{n}]
-        </a>
-      </sup>
-    );
+  return text.replace(/\[(\d+)\]/g, (whole, num) => {
+    const src = byNumber.get(Number(num));
+    return src ? `[[${num}]](${src.url})` : whole;
   });
 }
 
@@ -52,12 +35,20 @@ function TextSection({
       <h3 className="text-xs font-semibold uppercase tracking-wide text-primary">
         {title}
       </h3>
-      <p className="text-sm leading-relaxed">{withCitations(text, sources)}</p>
+      <Markdown>{linkCitations(text, sources)}</Markdown>
     </div>
   );
 }
 
-function ListSection({ title, items }: { title: string; items: string[] }) {
+function ListSection({
+  title,
+  items,
+  sources,
+}: {
+  title: string;
+  items: string[];
+  sources: Source[];
+}) {
   if (!items || items.length === 0) return null;
   return (
     <div className="space-y-1">
@@ -66,7 +57,9 @@ function ListSection({ title, items }: { title: string; items: string[] }) {
       </h3>
       <ul className="list-disc space-y-1 pl-5 text-sm">
         {items.map((it, i) => (
-          <li key={i}>{it}</li>
+          <li key={i}>
+            <Markdown className="inline">{linkCitations(it, sources)}</Markdown>
+          </li>
         ))}
       </ul>
     </div>
@@ -74,6 +67,7 @@ function ListSection({ title, items }: { title: string; items: string[] }) {
 }
 
 export function ReportView({ report }: { report: Report }) {
+  const sources = report.sources;
   return (
     <Card>
       <CardHeader>
@@ -83,45 +77,46 @@ export function ReportView({ report }: { report: Report }) {
         <TextSection
           title="Company Overview"
           text={report.overview}
-          sources={report.sources}
+          sources={sources}
         />
         <TextSection
           title="Products & Services"
           text={report.products}
-          sources={report.sources}
+          sources={sources}
         />
         <TextSection
           title="Target Customers"
           text={report.customers}
-          sources={report.sources}
+          sources={sources}
         />
         <TextSection
           title="Business Signals"
           text={report.signals}
-          sources={report.sources}
+          sources={sources}
         />
         <TextSection
           title="Risks & Challenges"
           text={report.risks}
-          sources={report.sources}
+          sources={sources}
         />
         <ListSection
           title="Suggested Discovery Questions"
           items={report.questions}
+          sources={sources}
         />
         <TextSection
           title="Suggested Outreach Strategy"
           text={report.outreach}
-          sources={report.sources}
+          sources={sources}
         />
-        <ListSection title="Unknowns" items={report.unknowns} />
-        {report.sources.length > 0 && (
+        <ListSection title="Unknowns" items={report.unknowns} sources={sources} />
+        {sources.length > 0 && (
           <div className="space-y-1">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-primary">
               Sources
             </h3>
             <ul className="space-y-1 text-sm">
-              {report.sources.map((s, i) => (
+              {sources.map((s, i) => (
                 <li key={i} className="break-all">
                   <span className="mr-1 text-muted-foreground">
                     [{s.n ?? i + 1}]

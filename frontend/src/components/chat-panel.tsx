@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Markdown } from "@/components/markdown";
 
 export function ChatPanel({ sessionId }: { sessionId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -82,7 +83,11 @@ export function ChatPanel({ sessionId }: { sessionId: string }) {
                     : "rounded-bl-sm bg-muted"
                 )}
               >
-                {m.content}
+                {m.role === "assistant" ? (
+                  <Markdown>{m.content}</Markdown>
+                ) : (
+                  m.content
+                )}
               </div>
             </div>
           ))}
