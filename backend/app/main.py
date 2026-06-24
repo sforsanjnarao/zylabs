@@ -18,7 +18,7 @@ logging.basicConfig(
     level=settings.log_level,
     format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
 )
-logger = logging.getLogger("project01")
+logger = logging.getLogger("zylabs")
 
 # ---- Create database tables if they don't exist yet ----
 Base.metadata.create_all(bind=engine)
@@ -26,14 +26,14 @@ Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Project01 backend started. Model=%s", settings.openai_model)
+    logger.info("zylabs backend started. Model=%s", settings.openai_model)
     yield
-    logger.info("Project01 backend shutting down.")
+    logger.info("zylabs backend shutting down.")
 
 
 # ---- The app ----
 app = FastAPI(
-    title="Project01 AI Research Copilot",
+    title="zylabs AI Research Copilot",
     version="0.1.0",
     lifespan=lifespan,
 )

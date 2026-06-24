@@ -13,7 +13,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from app.models.db_models import ChatMessage, Report
 from app.workflow.llm import get_llm
 
-logger = logging.getLogger("project01.chat")
+logger = logging.getLogger("zylabs.chat")
 
 
 def _report_context(report: Report | None) -> str:

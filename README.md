@@ -1,4 +1,4 @@
-# Project01 AI Research Copilot
+# zylabs AI Research Copilot
 
 An AI-powered research copilot that helps you prepare for a sales or business
 meeting. Give it a company name, website, and your objective, and it runs a
@@ -37,7 +37,7 @@ and produces a structured sales briefing — then lets you chat with the report.
 ## Project Structure
 
 ```
-project01/
+zylabs/
 ├── backend/
 │   ├── app/
 │   │   ├── api/            # FastAPI routes (sessions, workflow, chat)
@@ -143,7 +143,7 @@ All settings are read from `backend/.env` (see `.env.example`):
 | `OPENAI_API_KEY`  | —                        | OpenAI key (required)      |
 | `TAVILY_API_KEY`  | —                        | Tavily key (required)      |
 | `OPENAI_MODEL`    | `gpt-4o-mini`            | Chat model                 |
-| `DATABASE_URL`    | `sqlite:///./project01.db`  | Database connection string |
+| `DATABASE_URL`    | `sqlite:///./zylabs.db`  | Database connection string |
 | `LOG_LEVEL`       | `INFO`                   | Logging verbosity          |
 | `CORS_ORIGINS`    | `http://localhost:3000,http://127.0.0.1:3000` | Comma-separated allowed frontend origins |
 
@@ -168,7 +168,7 @@ string (looks like `postgresql://user:pass@host/db?sslmode=require`).
    - `OPENAI_API_KEY`, `TAVILY_API_KEY`
    - `DATABASE_URL` → the Neon connection string
    - `CORS_ORIGINS` → your Vercel URL (add after step 3)
-3. Deploy and note the backend URL, e.g. `https://project01-backend.onrender.com`.
+3. Deploy and note the backend URL, e.g. `https://zylabs-backend.onrender.com`.
 
 > The backend supports both SQLite (local) and Postgres (production)
 > automatically based on `DATABASE_URL`.

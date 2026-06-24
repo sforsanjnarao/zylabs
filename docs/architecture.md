@@ -2,7 +2,7 @@
 
 ## Overview
 
-Project01 Research Copilot is a three-tier application: a React frontend, a
+zylabs Research Copilot is a three-tier application: a React frontend, a
 FastAPI backend, and a LangGraph AI workflow, with SQLite for persistence.
 
 ```

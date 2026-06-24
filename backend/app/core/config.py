@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # Tunable defaults
     openai_model: str = "gpt-4o-mini"
-    database_url: str = "sqlite:///./project01.db"
+    database_url: str = "sqlite:///./zylabs.db"
     log_level: str = "INFO"
 
     # Comma-separated list of allowed frontend origins for CORS.

@@ -1,7 +1,7 @@
 # Engineering Decisions
 
 This document captures the major engineering decisions made while building the
-Project01 Research Copilot, the alternatives considered, and the tradeoffs behind
+zylabs Research Copilot, the alternatives considered, and the tradeoffs behind
 each choice.
 
 ## Decision 1: Stream progress by polling the database (SSE-over-DB)

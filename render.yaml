@@ -3,7 +3,7 @@
 # Secret values (sync: false) are entered in the Render dashboard, not here.
 services:
   - type: web
-    name: project01-backend
+    name: zylabs-backend
     runtime: python
     plan: free
     rootDir: backend

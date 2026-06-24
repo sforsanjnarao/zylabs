@@ -11,7 +11,7 @@ from app.models.db_models import ChatMessage, ResearchSession
 from app.schemas import ChatMessageOut, ChatRequest
 from app.services.chat import answer
 
-logger = logging.getLogger("project01.api")
+logger = logging.getLogger("zylabs.api")
 
 router = APIRouter(prefix="/api/sessions", tags=["chat"])
 

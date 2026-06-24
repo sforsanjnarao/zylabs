@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project01 Research Copilot",
+  title: "zylabs Research Copilot",
   description: "AI-powered company research for sales meeting prep.",
 };
 

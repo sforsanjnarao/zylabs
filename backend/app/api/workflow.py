@@ -13,7 +13,7 @@ from app.models.db_models import Report, ResearchSession, WorkflowStep
 from app.schemas import ReportOut
 from app.services.runner import start_workflow
 
-logger = logging.getLogger("project01.api")
+logger = logging.getLogger("zylabs.api")
 
 router = APIRouter(prefix="/api/sessions", tags=["workflow"])
 

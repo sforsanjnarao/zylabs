@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 from app.workflow.llm import get_llm
 from app.workflow.search import get_search
 
-logger = logging.getLogger("project01.workflow")
+logger = logging.getLogger("zylabs.workflow")
 
 MAX_ATTEMPTS = 2
 

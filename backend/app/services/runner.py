@@ -12,7 +12,7 @@ from app.core.database import SessionLocal
 from app.models.db_models import Report, ResearchSession, WorkflowStep
 from app.workflow.graph import build_graph, initial_state
 
-logger = logging.getLogger("project01.runner")
+logger = logging.getLogger("zylabs.runner")
 
 
 def _persist_step(db, session_id: str, step: dict) -> None:
