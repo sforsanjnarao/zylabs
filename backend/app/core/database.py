@@ -1,8 +1,11 @@
 """Database setup using SQLAlchemy.
 
-Defines the engine (connection to SQLite), a session factory (how we open
+Defines the engine (connection to the database), a session factory (how we open
 short-lived conversations with the DB), and the Base class that all of our
 table models inherit from.
+
+Works with both SQLite (local dev) and Postgres (production) — the connection
+arguments are chosen based on the DATABASE_URL.
 """
 
 from sqlalchemy import create_engine
@@ -10,11 +13,15 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.core.config import settings
 
-# The engine is the core connection to the database.
-# check_same_thread=False is required for SQLite when used by FastAPI.
+_is_sqlite = settings.database_url.startswith("sqlite")
+
+# check_same_thread=False is required only for SQLite (we use threads).
+# pool_pre_ping verifies connections before use — important for managed
+# Postgres (e.g. Neon) that may close idle connections.
 engine = create_engine(
     settings.database_url,
-    connect_args={"check_same_thread": False},
+    connect_args={"check_same_thread": False} if _is_sqlite else {},
+    pool_pre_ping=not _is_sqlite,
 )
 
 # SessionLocal() creates a new DB session (a unit of work) each time.

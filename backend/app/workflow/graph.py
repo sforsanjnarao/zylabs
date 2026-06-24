@@ -108,7 +108,10 @@ def research_node(state: GraphState) -> dict:
     """Search the web (Tavily) and gather raw notes + sources."""
     try:
         search = get_search(max_results=5)
-        query = f"{state['company']} company overview products customers funding news"
+        # Steer the search with the user's objective so research targets what
+        # matters for THIS meeting, not just a generic company lookup.
+        base = f"{state['company']} company overview products customers funding news"
+        query = f"{state['company']} {state['objective']} {base}" if state.get("objective") else base
         # On a redo, incorporate the quality feedback to dig deeper.
         if state.get("quality_feedback"):
             query += f" {state['quality_feedback']}"
@@ -154,9 +157,11 @@ def analysis_node(state: GraphState) -> dict:
         llm = get_llm().with_structured_output(ReportSections)
         prompt = (
             f"Company: {state['company']}\n"
-            f"Objective: {state.get('objective') or 'general meeting prep'}\n\n"
+            f"Objective: {state.get('objective') or 'general meeting prep'}\n"
+            f"Research plan (priorities to emphasize):\n{state.get('plan') or 'n/a'}\n\n"
             f"Research notes from the web:\n{state.get('research_notes', '')}\n\n"
-            f"Based ONLY on the notes above, fill in the report sections. "
+            f"Based ONLY on the notes above, fill in the report sections, "
+            f"prioritizing the angles called out in the research plan. "
             f"Be specific and honest. If something is not in the notes, list it "
             f"under 'unknowns' rather than guessing."
         )

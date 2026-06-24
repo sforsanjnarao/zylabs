@@ -6,15 +6,24 @@ separate from the database models is a common, clean practice.
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 # ---------- Sessions ----------
 class SessionCreate(BaseModel):
     """Body for POST /api/sessions."""
-    company_name: str
+    company_name: str = Field(min_length=1, description="Company to research (required)")
     website: str = ""
     objective: str = ""
+
+    @field_validator("company_name")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        """Reject whitespace-only names that slip past min_length."""
+        v = v.strip()
+        if not v:
+            raise ValueError("company_name must not be empty")
+        return v
 
 
 class SessionSummary(BaseModel):

@@ -58,7 +58,8 @@ project01/
 ├── docs/
 │   ├── architecture.md
 │   ├── product-improvements.md
-│   └── engineering-decisions.md
+│   ├── engineering-decisions.md
+│   └── non-functional-requirements.md
 └── README.md
 ```
 
@@ -124,7 +125,12 @@ Open `http://localhost:3000`.
 4. The frontend streams that progress live via SSE.
 5. When finished, the structured report is displayed and you can chat with it.
 
-See `docs/architecture.md` for the full design.
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md) — layers, data flow, tradeoffs.
+- [`docs/engineering-decisions.md`](docs/engineering-decisions.md) — key decisions, alternatives, tradeoffs.
+- [`docs/product-improvements.md`](docs/product-improvements.md) — weaknesses, top-3 next, business thinking.
+- [`docs/non-functional-requirements.md`](docs/non-functional-requirements.md) — performance, scalability, reliability, security, observability targets (current vs. production).
 
 ---
 
@@ -139,3 +145,40 @@ All settings are read from `backend/.env` (see `.env.example`):
 | `OPENAI_MODEL`    | `gpt-4o-mini`            | Chat model                 |
 | `DATABASE_URL`    | `sqlite:///./project01.db`  | Database connection string |
 | `LOG_LEVEL`       | `INFO`                   | Logging verbosity          |
+| `CORS_ORIGINS`    | `http://localhost:3000,http://127.0.0.1:3000` | Comma-separated allowed frontend origins |
+
+---
+
+## Deployment
+
+The app deploys as two services plus a managed database:
+
+- **Frontend → Vercel** (Next.js)
+- **Backend → Render** (FastAPI, via `render.yaml`)
+- **Database → Neon** (managed Postgres)
+
+### 1. Database (Neon)
+Create a free project at [neon.tech](https://neon.tech) and copy the connection
+string (looks like `postgresql://user:pass@host/db?sslmode=require`).
+
+### 2. Backend (Render)
+1. Render Dashboard → **New → Blueprint** → select this repo (it reads
+   `render.yaml`).
+2. Set the secret env vars in the dashboard:
+   - `OPENAI_API_KEY`, `TAVILY_API_KEY`
+   - `DATABASE_URL` → the Neon connection string
+   - `CORS_ORIGINS` → your Vercel URL (add after step 3)
+3. Deploy and note the backend URL, e.g. `https://project01-backend.onrender.com`.
+
+> The backend supports both SQLite (local) and Postgres (production)
+> automatically based on `DATABASE_URL`.
+
+### 3. Frontend (Vercel)
+1. [vercel.com](https://vercel.com) → **Add New → Project** → import this repo.
+2. Set **Root Directory** to `frontend`.
+3. Add env var `NEXT_PUBLIC_API_BASE` → your Render backend URL.
+4. Deploy, then add the resulting Vercel URL to the backend's `CORS_ORIGINS`
+   and redeploy the backend.
+
+> Note: Render's free backend sleeps when idle, so the first request after a
+> period of inactivity can take ~50s to wake.

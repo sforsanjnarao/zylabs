@@ -41,7 +41,9 @@ app = FastAPI(
 # Allow the React dev server to call this API.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # dev-friendly; tighten for production
+    # Explicit origins (not "*"): a wildcard is invalid alongside
+    # allow_credentials per the CORS spec. Configure via CORS_ORIGINS in .env.
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

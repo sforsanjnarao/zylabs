@@ -5,6 +5,7 @@ sse-starlette==3.4.5
 
 # Database
 sqlalchemy==2.0.51
+psycopg2-binary==2.9.10  # Postgres driver (production)
 
 # Config & validation
 pydantic==2.13.4
