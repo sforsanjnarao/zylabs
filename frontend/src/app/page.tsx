@@ -24,6 +24,7 @@ export default function Home() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     company_name: "",
     website: "",
@@ -37,6 +38,21 @@ export default function Home() {
       .catch((e: Error) => toast.error(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleDelete(e: React.MouseEvent, id: string) {
+    e.stopPropagation();
+    if (!confirm("Delete this session? This cannot be undone.")) return;
+    setDeletingId(id);
+    try {
+      await api.deleteSession(id);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Session deleted");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -134,10 +150,16 @@ export default function Home() {
               </p>
             )}
             {sessions.map((s) => (
-              <button
+              <div
                 key={s.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => router.push(`/sessions/${s.id}`)}
-                className="flex w-full items-center justify-between rounded-lg border p-3 text-left transition-colors hover:border-primary hover:bg-accent"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    router.push(`/sessions/${s.id}`);
+                }}
+                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:border-primary hover:bg-accent"
               >
                 <div className="min-w-0">
                   <div className="truncate font-medium">{s.company_name}</div>
@@ -145,8 +167,21 @@ export default function Home() {
                     {s.objective || "No objective"}
                   </div>
                 </div>
-                <StatusBadge status={s.status} />
-              </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <StatusBadge status={s.status} />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={deletingId === s.id}
+                    onClick={(e) => handleDelete(e, s.id)}
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label={`Delete ${s.company_name} session`}
+                  >
+                    {deletingId === s.id ? "…" : "Delete"}
+                  </Button>
+                </div>
+              </div>
             ))}
           </CardContent>
         </Card>

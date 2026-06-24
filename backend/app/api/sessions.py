@@ -39,3 +39,13 @@ def get_session(session_id: str, db: Session = Depends(get_db)):
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
     return session
+
+
+@router.delete("/{session_id}", status_code=204)
+def delete_session(session_id: str, db: Session = Depends(get_db)):
+    """Delete a session and its report, steps, and chat messages (cascade)."""
+    session = db.get(ResearchSession, session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    db.delete(session)
+    db.commit()
